@@ -18,6 +18,7 @@ async function run(){
         await client.connect();
         const allProducts =client.db("manufacturers").collection("products");
         const allusers =client.db("manufacturers").collection("users");
+        const allreviews =client.db("manufacturers").collection("reviews");
 
         //get all products
         app.get('/products', async(req,res)=>{
@@ -40,6 +41,12 @@ async function run(){
         const result= await allusers.insertOne(data);
         res.send(result);
     })
+    // review add api 
+    app.post('/reviews',async(req,res)=>{
+      const data= req.body;
+      const result= await allreviews.insertOne(data);
+      res.send(result);
+  })
     }
     finally{
 
