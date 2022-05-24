@@ -38,24 +38,30 @@ async function run(){
       // user info insert
       app.post('/users',async(req,res)=>{
         const data= req.body;
+        const query = {email: data.email}
+        const exist = await allusers.findOne(query);
+        if(exist){
+          return res.send({success:false, data:exist})
+        }
         const result= await allusers.insertOne(data);
-        res.send(result);
+        return res.send({success:true,result});
+        
     })
     // review add api 
     app.post('/reviews',async(req,res)=>{
       const data= req.body;
       const result= await allreviews.insertOne(data);
       res.send(result);
-  })
-// get review 
-app.get('/review', async(req,res)=>{ 
-  const query = {};
-  const cursor = allreviews.find(query);
-  const review = await cursor.toArray();
-  res.send(review);
-
-})
-
+    })
+     // get review 
+     app.get('/review', async(req,res)=>{ 
+       const query = {};
+       const cursor = allreviews.find(query);
+       const review = await cursor.toArray();
+       res.send(review);
+     
+     })
+     
 
     }
     finally{
