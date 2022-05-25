@@ -54,6 +54,25 @@ async function run(){
           const users = await usersinfoLogin.find().toArray();
           res.send(users);
         })
+        // get admin for protect route
+        app.get('/admin/:email',async(req,res)=>{
+          const email = req.params.email;
+          const user =await usersinfoLogin.findOne({email:email});
+          const isAdmin =user.role === "admin";
+          res.send({admin:isAdmin});
+        })
+        // make user admin
+        app.put('/user/admin/:email',async(req,res)=>{
+          const email= req.params.email;
+           const filter = {email:email};
+          
+          const updateDoc = {
+            $set: {role:'admin'},
+          }
+          const result = await usersinfoLogin.updateOne(filter,updateDoc);
+        
+          res.send(result);
+        })
     // user info when user login,signup
     app.put('/user/:email',async(req,res)=>{
       const email= req.params.email;
