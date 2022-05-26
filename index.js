@@ -21,6 +21,7 @@ async function run(){
         const allusers =client.db("manufacturers").collection("users");
         const allreviews =client.db("manufacturers").collection("reviews");
         const  usersinfoLogin =client.db("manufacturers").collection("usersinfo");
+        const orderinfo =client.db("manufacturers").collection("order");
 
         //get all products
         app.get('/products', async(req,res)=>{
@@ -49,7 +50,7 @@ async function run(){
         return res.send({success:true,result});
 
     })
-    // login user get
+    // get login user 
         app.get ('/user' ,async(req,res)=>{
           const users = await usersinfoLogin.find().toArray();
           res.send(users);
@@ -132,7 +133,21 @@ async function run(){
        res.send(review);
      
      })
+    //  post all booking order
+    app.post('/booking',async(req,res)=>{
+      const data = req.body;
      
+      const result = await orderinfo.insertOne(data);
+      res.send(result);
+    })
+    // get booking items use email
+    app.get('/booking',async(req,res)=>{
+      const email = req.query.email;
+      const query = {email};
+      const cursor =  orderinfo.find(query);
+      const result = await cursor.toArray() 
+      res.send(result);
+    }) 
 
     }
     finally{
