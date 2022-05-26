@@ -5,7 +5,7 @@ const app = express()
 const port = process.env.PORT || 5000
 require('dotenv').config();
 const { MongoClient, ServerApiVersion,ObjectId } = require('mongodb');
-
+const stripe = require("stripe")(process.env.STRIPE_SECRIT_KET);
 
 // 
 app.use(cors());
@@ -22,6 +22,7 @@ async function run(){
         const allreviews =client.db("manufacturers").collection("reviews");
         const  usersinfoLogin =client.db("manufacturers").collection("usersinfo");
         const orderinfo =client.db("manufacturers").collection("order");
+        const paymentinfo =client.db("manufacturers").collection("payment");
 
         //get all products
         app.get('/products', async(req,res)=>{
@@ -148,6 +149,46 @@ async function run(){
       const result = await cursor.toArray() 
       res.send(result);
     }) 
+    // for pay get specific order item
+    app.get('/booking/:id',async(req,res)=>{
+      const id = req.params.id;
+      const query = {_id: ObjectId(id)};
+      const booking = await orderinfo.findOne(query);
+      res.send(booking);
+    })
+// payment api 
+app.post("/create-payment-intent", async (req, res) => {
+  const product = req.body;
+const price = product.price;
+const amount = price*100;
+
+
+  const paymentIntent = await stripe.paymentIntents.create({
+    amount: amount,
+    currency: "usd",
+     payment_method_types: ['card']
+  });
+  res.send({ clientSecret: paymentIntent.client_secret});
+})
+// payment information add to orderinfo
+
+app.patch('/bookingorder/:id',async(req,res)=>{
+  const id = req.params.id;
+  const payment = req.body;
+  const filter = {_id: ObjectId(id)};
+  const updateDoc = {
+    $set:{
+      paid:true,
+      transaction: payment.transaction,
+    }
+  }
+  const result = await paymentinfo.insertOne(payment);
+  const ubdateTransaction = await orderinfo.updateOne(updateDoc,filter);
+  res.send(ubdateTransaction);
+
+
+})
+
 
     }
     finally{
