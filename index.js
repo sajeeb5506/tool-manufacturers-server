@@ -188,6 +188,21 @@ app.patch('/bookingorder/:id',async(req,res)=>{
 
 
 })
+// get all order admin page
+app.get('/allorders', async(req,res)=>{
+  const query = {};
+  const cursor = orderinfo.find(query);
+  const products = await cursor.toArray();
+  res.send(products);
+
+})
+// delete order by admin 
+app.delete('/allorders/:id',async(req,res)=>{
+    const id= req.params.id;
+    const query = {_id:ObjectId(id)};
+    const result = await orderinfo.deleteOne(query);
+    res.send(result);
+})
 
 
     }
