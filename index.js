@@ -178,12 +178,12 @@ app.patch('/bookingorder/:id',async(req,res)=>{
   const filter = {_id: ObjectId(id)};
   const updateDoc = {
     $set:{
-      paid:true,
+      paid:"true",
       transaction: payment.transaction,
     }
   }
   const result = await paymentinfo.insertOne(payment);
-  const ubdateTransaction = await orderinfo.updateOne(updateDoc,filter);
+  const ubdateTransaction = await orderinfo.updateOne(filter,updateDoc);
   res.send(ubdateTransaction);
 
 
